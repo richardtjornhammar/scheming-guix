@@ -3,6 +3,8 @@
  '( "julia"
     "julia-parsers"
     "julia-fixedpointnumbers"
+    "julia-json"
+    "julia-adapt"
     "julia-compat"
     "julia-datastructures"
     "julia-orderedcollections"
