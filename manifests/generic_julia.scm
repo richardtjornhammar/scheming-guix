@@ -1,6 +1,10 @@
 ; guix environment --manifest=generic_julia.scm
 ( specifications->manifest
- '( "julia"
+ '( "glibc"
+    "curl"
+    "openssl"
+    "p7zip"
+    "julia"
     "julia-parsers"
     "julia-fixedpointnumbers"
     "julia-json"
