@@ -14,35 +14,23 @@
              (gnu services docker)
              (gnu services auditd)
              (gnu system locale)
-             (nongnu packages linux)
-             (nongnu system linux-initrd)
+             (nongnu packages linux)		;	NONFREE
+             (nongnu system linux-initrd)	;	NONFREE
             )
 (use-service-modules desktop networking ssh xorg cups docker auditd  nix ) ; nix
 (use-package-modules package-management) ; TEST
-;;
-;;;; NONFREE
-;(use-modules (nongnu packages linux)
-;             (nongnu system linux-initrd))
-;
-;(operating-system
-;  (kernel linux)
-;  (initrd microcode-initrd)
-;  (firmware (list linux-firmware))
-;  ...
-;  )
-;;;;
-;;
+
 (operating-system
   (locale "sv_SE.utf8")
   ;
-  ;(locale-definitions
-  ;  (append 
-  ;    (list (locale-definition (name "sv_SE.utf8") (source "sv_SE") (charset "UTF-8") )
-  ;          (locale-definition (name "en_US.utf8") (source "en_US") (charset "UTF-8") )
-  ;          (locale-definition (name "zh_CN.utf8") (source "zh_CN") (charset "UTF-8") )
-  ;    )
-  ;  )
-  ;)
+  (locale-definitions
+    (append 
+      (list (locale-definition (name "sv_SE.utf8") (source "sv_SE") (charset "UTF-8") )
+            (locale-definition (name "en_US.utf8") (source "en_US") (charset "UTF-8") )
+            (locale-definition (name "zh_CN.utf8") (source "zh_CN") (charset "UTF-8") )
+      )
+    )
+  )
   (timezone "Europe/Stockholm")
   (keyboard-layout (keyboard-layout "se"))
   (host-name "specter")
@@ -69,25 +57,27 @@
 	    (specification->package "cups")
 	    (specification->package "hplip")
             (specification->package "util-linux")
-	    (specification->package "ghostscript") ;)
-            nix ) ; TESTING
+	    (specification->package "ghostscript")
+	    (specification->package "xf86-video-amdgpu")
+	    (specification->package "amdgpu-firmware") ; NONFREE
+            nix )
       %base-packages))
   (services
     (append
       (list (service openssh-service-type)
             (service tor-service-type)
-            (service nix-service-type) ; TESTING
+            (service nix-service-type)
             (service docker-service-type)
             (service auditd-service-type)
             (service cups-service-type
               (cups-configuration 
-                (web-interface? #t) ; ))
+                (web-interface? #t)
                 (extensions
                   (list cups-filters hplip)) ))
             (set-xorg-configuration
               (xorg-configuration
                 (keyboard-layout keyboard-layout)
-                ; (drivers '("xf86-video-amdgpu" "modesetting" "vesa" ) )
+                (drivers '("amdgpu") ) ;"modesetting" "vesa" ) )
               )
             )
       )
@@ -95,7 +85,7 @@
   (bootloader
     (bootloader-configuration
       (bootloader grub-bootloader)
-      (target "/dev/sda")
+      (targets (list "/dev/sda")) ; DEPRECTAION WARNING TARGET TO TARGETS LIST
       (keyboard-layout keyboard-layout)))
   (mapped-devices
     (list (mapped-device
